@@ -20,6 +20,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	
 	// lookup in the name server
 	public static SharedObject lookup(String name) {
+		return null;
 	}		
 	
 	// binding in the name server
@@ -28,6 +29,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// creation of a shared object
 	public static SharedObject create(Object o) {
+		return null;
 	}
 	
 /////////////////////////////////////////////////////////////
@@ -36,14 +38,17 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// request a read lock from the server
 	public static Object lock_read(int id) {
+		return id;
 	}
 
 	// request a write lock from the server
 	public static Object lock_write (int id) {
+		return id;
 	}
 
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
+		return id;
 	}
 
 
@@ -54,5 +59,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
+		return id;
 	}
 }

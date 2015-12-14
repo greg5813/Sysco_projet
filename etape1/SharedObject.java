@@ -2,6 +2,16 @@ import java.io.*;
 
 public class SharedObject implements Serializable, SharedObject_itf {
 	
+	int lock = 0;	// (0) NL: no local lock
+					// (1) RLC: read lock cached (not taken)
+					// (2) WLC: write lock cached
+					// (3) RLT: read lock taken
+					// (4) WLT: write lock taken
+					// (5) RLT_WLC: read lock taken and write lock cached
+	
+	public Sentence obj;
+	public int id;
+	
 	// invoked by the user program on the client node
 	public void lock_read() {
 	}
@@ -17,6 +27,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 
 	// callback invoked remotely by the server
 	public synchronized Object reduce_lock() {
+		return null;
 	}
 
 	// callback invoked remotely by the server
@@ -24,5 +35,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
 
 	public synchronized Object invalidate_writer() {
+		return null;
 	}
 }
