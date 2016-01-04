@@ -1,37 +1,55 @@
+import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.util.HashMap;
 
 public class Server implements Server_itf{
 	
-	int id = 0;
+	private int id = 0;
+	private HashMap<Integer,ServerObject> servers;
+	private HashMap<String,Integer> names;
 
 	@Override
+	//OK
 	public int lookup(String name) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return names.get(name);
 	}
 
 	@Override
+	//OK
 	public void register(String name, int id) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		names.put(name, id);
 	}
 
 	@Override
+	//OK
 	public int create(Object o) throws RemoteException {
-		// TODO Auto-generated method stub
-		return id++;
+		id++;
+		ServerObject so = new ServerObject(o);
+		servers.put(id, so);
+		return id;
 	}
 
 	@Override
+	//OK
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		return servers.get(id).lock_read(client);
 	}
 
 	@Override
+	//OK
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		return servers.get(id).lock_write(client);
+	}
+	
+	public static void main(String[] args) {
+		try{
+			LocateRegistry.createRegistry(2080);
+			Server s = new Server();
+			Naming.rebind("//localhost:2080/server", s);
+		} catch (Exception e) {
+			//
+		}
 	}
 
 }

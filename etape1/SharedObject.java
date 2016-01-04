@@ -2,65 +2,88 @@ import java.io.*;
 
 public class SharedObject implements Serializable, SharedObject_itf {
 	
-	int lock = 0;	// (0) NL: no local lock
-					// (1) RLC: read lock cached (not taken)
-					// (2) WLC: write lock cached
-					// (3) RLT: read lock taken
-					// (4) WLT: write lock taken
-					// (5) RLT_WLC: read lock taken and write lock cached
-	
+	private enum Etat {NL, RLT, RLC, WLT, WLC, RLT_WLC};
+	private Etat lock;
 	public Object obj;
 	public int id;
 	
-	public SharedObject(Object o) {
+	public SharedObject(Object o, int id) {
 		this.obj = o;
+		this.id = id;
 	}
 	
 	// invoked by the user program on the client node
 	public void lock_read() {
-		Client.lock_read(id);
 		switch (lock) {
-		case 0: 		// NL: no local lock
-			lock = 3; 	// RLT: read lock taken
+		case NL: 		
+			Client.lock_read(id);
+			lock = Etat.RLT; 	
 			break;
-		case 1: 		// RLC: read lock cached (not taken)
-			lock = 3; 	// RLT: read lock taken
+		case RLC: 		
+			lock = Etat.RLT; 	
 			break;	
-		case 2: 		// WLC: write lock cached
-			lock = 5; 	// RLT_WLC: read lock taken and write lock cached
+		case WLC: 		
+			lock = Etat.RLT; 	
 			break;	
 		}
 	}
 
 	// invoked by the user program on the client node
 	public void lock_write() {
-		Client.lock_write(id);
-		lock = 4;
+		switch (lock) {
+		case NL: 		
+			Client.lock_write(id);
+			lock = Etat.WLT; 	
+			break;
+		case WLC: 		
+			lock = Etat.WLT; 	
+			break;	
+		case RLC:
+			Client.lock_write(id);
+			lock = Etat.WLT; 	
+			break;	
+		}
 	}
 
 	// invoked by the user program on the client node
 	public synchronized void unlock() {
 		switch (lock) {
-		case 3: 		// RLT: read lock taken
-			lock = 1; 	// RLC: read lock cached (not taken)
+		case RLT: 		
+			lock = Etat.RLC; 	
 			break;
-		case 4: 		// WLT: write lock taken
-			lock = 2; 	// WLC: write lock cached
-			break;	
+		case WLT: 		
+			lock = Etat.WLC; 	
+			break;
+		case RLT_WLC:			
+			lock = Etat.WLC;	
+			break;
 		}
 	}
 
 
 	// callback invoked remotely by the server
 	public synchronized Object reduce_lock() {
+		switch (lock) {
+		case RLT: 	
+			lock = Etat.RLC; 
+			break;
+		case WLT: 	
+			lock = Etat.WLC; 	
+			break;	
+		case RLT_WLC:	
+			lock = Etat.RLT;	
+			break;
+		}
 		return null;
 	}
 
 	// callback invoked remotely by the server
 	public synchronized void invalidate_reader() {
+		lock = Etat.NL;
 	}
 
 	public synchronized Object invalidate_writer() {
+		lock = Etat.NL;
 		return null;
 	}
 }
