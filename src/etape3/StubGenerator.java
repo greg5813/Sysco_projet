@@ -33,10 +33,17 @@ public class StubGenerator {
 		Method[] methods = getAccessibleMethods(c);
 		
 		for ( Method m : methods) {
+			Parameter[] parameters = m.getParameters();
+			int i;
 			
 			sb.append("	"+Modifier.toString(m.getModifiers())+" "+m.getReturnType().getName()+" "+m.getName()+"(");
-			for (Parameter p : m.getParameters()) {
+			i = 0;
+			for (Parameter p : parameters) {
 				sb.append(p.getType().getName()+" "+p.getName());
+				if (i!=parameters.length-1) {
+					sb.append(", ");
+				}
+				i++;
 			}
 			sb.append(")");
 			sb.append(" {\n");
@@ -49,8 +56,13 @@ public class StubGenerator {
 				sb.append("		o.");
 			}
 			sb.append(m.getName()+"(");
-			for (Parameter p : m.getParameters()) {
+			i = 0;
+			for (Parameter p : parameters) {
 				sb.append(p.getName());
+				if (i!=parameters.length-1) {
+					sb.append(", ");
+				}
+				i++;
 			}
 			sb.append(");\n");
 			
