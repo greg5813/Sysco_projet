@@ -20,6 +20,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		
 	}
 
+	// invoked by a client on the server
 	public synchronized Object lock_read(Client_itf client) {
 		if(clientWriter!=null){
 			try {
@@ -37,6 +38,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		return obj;
 	}
 
+	// invoked by a client on the server
 	public synchronized Object lock_write(Client_itf client) {
 		if(clientWriter!=null){
 			try {
@@ -73,6 +75,8 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		return obj;
 	}
 	
+
+	// request invalidate_reader on given client in parallel
 	class InvalidateReader extends Thread {
 		private Client_itf client;
 		public InvalidateReader(Client_itf c) {

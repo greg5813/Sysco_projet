@@ -18,6 +18,7 @@ public class Server extends UnicastRemoteObject implements Server_itf{
 		names = new HashMap<String,Integer>();
 	}
 
+	// get the id of the shared object by it's name
 	@Override
 	public int lookup(String name) throws RemoteException {
 		Object i = names.get(name);
@@ -27,11 +28,13 @@ public class Server extends UnicastRemoteObject implements Server_itf{
 		return (int) i;
 	}
 
+	// bind the shared object of given id and it's name in the server
 	@Override
 	public void register(String name, int id) throws RemoteException {
 		names.put(name, id);
 	}
 
+	// create a new shared object and return it's id
 	@Override
 	public int create(Object o) throws RemoteException {
 		id++;
@@ -40,11 +43,13 @@ public class Server extends UnicastRemoteObject implements Server_itf{
 		return id;
 	}
 
+	// request a lock_read of the shared object on the appropriate ServerObject
 	@Override
 	public Object lock_read(int id, Client_itf client) throws RemoteException {
 		return servers.get(id).lock_read(client);
 	}
 
+	// request a lock_write of the shared object on the appropriate ServerObject
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
 		return servers.get(id).lock_write(client);

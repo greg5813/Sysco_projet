@@ -161,6 +161,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		System.out.println("sharedobject invalidatereader id "+id +" state " + lock);
 	}
 
+	// callback invoked remotely by the server
 	public synchronized Object invalidate_writer() {
 		while(lock!=Etat.WLC){
 			try {
