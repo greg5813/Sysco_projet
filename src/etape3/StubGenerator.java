@@ -42,7 +42,6 @@ public class StubGenerator {
 		
 		for ( Method m : methods) {
 			Parameter[] parameters = m.getParameters();
-			Annotation[] annotations = m.getDeclaredAnnotations();
 			int i;
 			Read ra = m.getAnnotation(Read.class);
 			Write wa = m.getAnnotation(Write.class);
@@ -89,7 +88,7 @@ public class StubGenerator {
 				sb.append("		s.unlock();\n");
 			}
 			
-			sb.append("	}\n");
+			sb.append("	}\n\n");
 			
 		}
 		
@@ -112,11 +111,11 @@ public class StubGenerator {
 		}
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append("public class "+ c.getName() +"_stub extends SharedObject implements "+ c.getName() +"_itf, java.io.Serializable {\n");
+		sb.append("public class "+ c.getName() +"_stub extends SharedObject implements "+ c.getName() +"_itf, java.io.Serializable {\n\n");
 		
 		sb.append("	public "+c.getName()+"_stub(Object o, int id) {\n");
 		sb.append("		super(o, id);\n");
-		sb.append("	}\n");
+		sb.append("	}\n\n");
 	
 		sb = generateMethods(c, sb);
 		
