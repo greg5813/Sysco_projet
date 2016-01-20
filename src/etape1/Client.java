@@ -36,8 +36,11 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		try {
 			Integer id = s.lookup(name);
 			if (id != 0) {
-				so = new SharedObject(null,id);
-				objects.put(id,so);
+				so = objects.get(id);
+				if (so == null) {
+					so = new SharedObject(null,id);
+					objects.put(id,so);
+				}
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block

@@ -12,16 +12,37 @@
 
 \begin{document}
 \maketitle
+
+\bigskip
+\bigskip
+\bigskip
 \tableofcontents
 \newpage
 
 
 \section{Etape 1}
 
+On doit implanter le service de gestion d'objets partagés répartis. Dans cette première version, les 
+SharedObject sont utilisés explicitement par les applications. \\
 
+Plusieurs applications peuvent accéder de façon concurrente au même objet, ce qui nécessite de mettre en 
+œuvre un schéma de synchronisation globalement cohérent pour le service que l'on implante.
+On suppose que chaque application voulant utiliser un objet en récupère une référence (à un SharedObject) en 
+utilisant le serveur de nom. On ne gère pas le stockage de référence (à des objets partagés) dans des objets partagés.
+
+\subsection{Coté client}
+\subparagraph{Classe Client}
+\subparagraph{Classe SharedObject}
+
+\subsection{Coté serveur}
+\subparagraph{Classe Server}
+\subparagraph{Classe ServerObject}
+
+
+\clearpage
 \section{Etape 2}
 
-
+\clearpage
 \section{Etape 3}
 
 On doit  implanter un générateur de stub, destiné à soulager le programmeur de l'utilisation explicite des SharedObject. \\
@@ -37,7 +58,7 @@ On utilise la classe File qui permet de créer un nouveau fichier et la classe F
 Toute l'architecture du stub est écrite dans des chaines de caractères statique et seules les parties dépendantes de la classe dont on génère le stub telles que le nom des méthodes ou des paramètres est récupérés au moment opportun.\\
  On utilise l'introspection de Java pour accéder à la classe métier. Attention, l'utilisation de la méthode getParameter pour récupérer les paramètres d'une méthode nécessite l'utilisation de Java 8.
 
-
+\clearpage
 \section{Etape 4}
 
 
