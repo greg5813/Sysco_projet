@@ -1,18 +1,21 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
-import javax.lang.model.element.TypeParameterElement;
 
 public class StubGenerator {
 	
-	
+	/**
+	 * Récupérer les méthodes publiques déclarées dans une classe
+	 * @param c classe dont on veut les méthodes
+	 * @return un tableau des méthodes publiques déclarées dans c
+	 */
 	public static Method[] getAccessibleMethods(Class c) {
 		
 		List<Method> result = new ArrayList<Method>();
@@ -27,14 +30,23 @@ public class StubGenerator {
 	    return result.toArray(new Method[result.size()]);
 	}
 
-	
+	/**
+	 * Génère les méthodes du stub à partir d'une classe et le stocke dans un stringbuffer
+	 * @param c classe dont on veut le stub
+	 * @param sb stringbuffer contenant le début du stub
+	 * @return stringbuffer contenant en plus les méthodes du stub 
+	 */
 	public static StringBuffer generateMethods(Class c, StringBuffer sb) {
 		
 		Method[] methods = getAccessibleMethods(c);
 		
 		for ( Method m : methods) {
 			Parameter[] parameters = m.getParameters();
+			Annotation[] annotations = m.getDeclaredAnnotations();
 			int i;
+			Read ra = m.getAnnotation(Read.class);
+			Write wa = m.getAnnotation(Write.class);
+						
 			
 			sb.append("	"+Modifier.toString(m.getModifiers())+" "+m.getReturnType().getName()+" "+m.getName()+"(");
 			i = 0;
@@ -49,6 +61,13 @@ public class StubGenerator {
 			sb.append(" {\n");
 			
 			sb.append("		"+c.getName()+" o = ("+c.getName()+") obj;\n");
+
+			if (ra!=null) {
+				sb.append("		s.lock_read();\n");
+			}
+			if (wa!=null) {
+				sb.append("		s.lock_write();\n");
+			}
 			
 			if (!m.getReturnType().toString().equals("void")) {
 				sb.append("		return o.");
@@ -66,6 +85,10 @@ public class StubGenerator {
 			}
 			sb.append(");\n");
 			
+			if (ra!=null || wa!=null) {
+				sb.append("		s.unlock();\n");
+			}
+			
 			sb.append("	}\n");
 			
 		}
@@ -73,7 +96,10 @@ public class StubGenerator {
 		return sb;
 	}
 	
-	
+	/**
+	 * Génère un stub à partir d'une classe
+	 * @param c classe dont on veut le stub
+	 */
 	public static void generateStub(Class c) {
 		
 		File file = new File(c.getName().concat("_stub.java"));
