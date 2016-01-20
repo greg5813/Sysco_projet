@@ -12,13 +12,13 @@ import java.lang.reflect.Method;
 public class StubGenerator {
 	
 	/**
-	 * Récupérer les méthodes publiques déclarées dans une classe
+	 * Récupérer les méthodes publiques et déclarées dans une classe
 	 * @param c classe dont on veut les méthodes
 	 * @return un tableau des méthodes publiques déclarées dans c
 	 */
 	public static Method[] getAccessibleMethods(Class c) {
 		
-		List<Method> result = new ArrayList<Method>();
+	    List<Method> result = new ArrayList<Method>();
 		
 	    for (Method method : c.getDeclaredMethods()) {
 	        int modifiers = method.getModifiers();
@@ -46,7 +46,7 @@ public class StubGenerator {
 			Read ra = m.getAnnotation(Read.class);
 			Write wa = m.getAnnotation(Write.class);
 						
-			
+			// générer l'entête de la méthode
 			sb.append("	"+Modifier.toString(m.getModifiers())+" "+m.getReturnType().getName()+" "+m.getName()+"(");
 			i = 0;
 			for (Parameter p : parameters) {
@@ -59,8 +59,10 @@ public class StubGenerator {
 			sb.append(")");
 			sb.append(" {\n");
 			
+			// générer l'accés à l'objet 
 			sb.append("		"+c.getName()+" o = ("+c.getName()+") obj;\n");
 
+			// générer le verrou adéquoit
 			if (ra!=null) {
 				sb.append("		s.lock_read();\n");
 			}
@@ -68,6 +70,7 @@ public class StubGenerator {
 				sb.append("		s.lock_write();\n");
 			}
 			
+			// générer l'appel à la méthode de la classe métier
 			if (!m.getReturnType().toString().equals("void")) {
 				sb.append("		return o.");
 			} else {
@@ -84,6 +87,7 @@ public class StubGenerator {
 			}
 			sb.append(");\n");
 			
+			// générer la libération du verrou
 			if (ra!=null || wa!=null) {
 				sb.append("		s.unlock();\n");
 			}
@@ -101,6 +105,7 @@ public class StubGenerator {
 	 */
 	public static void generateStub(Class c) {
 		
+		// créer le fichier source du stub et un moyen d'y écrire
 		File file = new File(c.getName().concat("_stub.java"));
 		FileWriter writer = null;
 		try {
@@ -109,18 +114,24 @@ public class StubGenerator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// stocker le code généré dans un buffer
 		StringBuffer sb = new StringBuffer();
 		
+		// générer l'entête du stub
 		sb.append("public class "+ c.getName() +"_stub extends SharedObject implements "+ c.getName() +"_itf, java.io.Serializable {\n\n");
 		
+		// générer le code du stub
+		// générer le constructeur
 		sb.append("	public "+c.getName()+"_stub(Object o, int id) {\n");
 		sb.append("		super(o, id);\n");
 		sb.append("	}\n\n");
 	
+		// générer les méthodes
 		sb = generateMethods(c, sb);
 		
 		sb.append("}");
 		
+		// écrire le code généré dans le fichier
 		try {
 			writer.write(sb.toString());
 			writer.flush();
