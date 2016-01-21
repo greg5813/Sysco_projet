@@ -62,17 +62,17 @@ public class StubGenerator {
 			}
 			sb.append(")");
 			sb.append(" {\n");
-			
-			// générer l'accés à l'objet 
-			sb.append("		"+c.getName()+" o = ("+c.getName()+") obj;\n");
 
 			// générer le verrou adéquoit
 			if (ra!=null) {
-				sb.append("		lock_read();\n");
+				sb.append("		this.lock_read();\n");
 			}
 			if (wa!=null) {
-				sb.append("		lock_write();\n");
+				sb.append("		this.lock_write();\n");
 			}
+
+			// générer l'accés à l'objet 
+			sb.append("		"+c.getName()+" o = ("+c.getName()+") obj;\n");
 			
 			// générer l'appel à la méthode de la classe métier
 			if (!m.getReturnType().toString().equals("void")) {
@@ -93,7 +93,7 @@ public class StubGenerator {
 			
 			// générer la libération du verrou
 			if (ra!=null || wa!=null) {
-				sb.append("		unlock();\n");
+				sb.append("		this.unlock();\n");
 			}
 			
 			if (!m.getReturnType().toString().equals("void")) {

@@ -71,7 +71,7 @@ class readListener implements ActionListener {
 		irc = i;
 	}
 	public void actionPerformed (ActionEvent e) {
-		
+
 		// lock the object in read mode
 		//irc.sentence.lock_read();
 		
@@ -83,6 +83,7 @@ class readListener implements ActionListener {
 		
 		// display the read value
 		irc.text.append(s+"\n");
+
 	}
 }
 
@@ -105,6 +106,7 @@ class writeListener implements ActionListener {
 		
 		// unlock the object
 		//irc.sentence.unlock();
+
 	}
 }
 

@@ -51,7 +51,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 			break;
 		}
-		System.out.println("sharedobject lockread id "+id +" state " + lock);
+		System.err.println("sharedobject lockread id "+id +" state " + lock);
 	}
 
 	// invoked by the user program on the client node
@@ -93,7 +93,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 			break;
 		}
-		System.out.println("sharedobject lockwrite id "+id +" state " + lock);
+		System.err.println("sharedobject lockwrite id "+id +" state " + lock);
 	}
 
 	// invoked by the user program on the client node
@@ -118,7 +118,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			notifyAll();
 			break;
 		}
-		System.out.println("sharedobject unlock id "+id +" state " + lock);
+		System.err.println("sharedobject unlock id "+id +" state " + lock);
 	}
 
 
@@ -143,7 +143,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			lock = Etat.RLT;	
 			break;
 		}
-		System.out.println("sharedobject reducelock id "+id +" state " + lock);
+		System.err.println("sharedobject reducelock id "+id +" state " + lock);
 		return obj;
 	}
 
@@ -158,7 +158,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 		}
 		lock = Etat.NL;
-		System.out.println("sharedobject invalidatereader id "+id +" state " + lock);
+		System.err.println("sharedobject invalidatereader id "+id +" state " + lock);
 	}
 
 	// callback invoked remotely by the server
@@ -172,7 +172,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 			}
 		}
 		lock = Etat.NL;
-		System.out.println("sharedobject invalidatewriter id "+id +" state " + lock);
+		System.err.println("sharedobject invalidatewriter id "+id +" state " + lock);
 		return obj;
 	}
 }

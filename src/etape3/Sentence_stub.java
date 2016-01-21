@@ -5,17 +5,17 @@ public class Sentence_stub extends SharedObject implements Sentence_itf, java.io
 	}
 
 	public void write(java.lang.String arg0) {
+		this.lock_write();
 		Sentence o = (Sentence) obj;
-		lock_write();
 		o.write(arg0);
-		unlock();
+		this.unlock();
 	}
 
 	public java.lang.String read() {
+		this.lock_read();
 		Sentence o = (Sentence) obj;
-		lock_read();
 		java.lang.String rt = o.read();
-		unlock();
+		this.unlock();
 		return rt;
 	}
 
