@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -5,6 +6,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import java.lang.reflect.Method;
 
 
@@ -35,7 +40,7 @@ public class StubGenerator {
 	 * @param sb stringbuffer contenant le début du stub
 	 * @return stringbuffer contenant en plus les méthodes du stub 
 	 */
-	public static StringBuffer generateMethods(Class c, StringBuffer sb) {
+	public static StringBuffer generateMethodsCode(Class c, StringBuffer sb) {
 		
 		Method[] methods = getAccessibleMethods(c);
 		
@@ -63,15 +68,15 @@ public class StubGenerator {
 
 			// générer le verrou adéquoit
 			if (ra!=null) {
-				sb.append("		s.lock_read();\n");
+				sb.append("		lock_read();\n");
 			}
 			if (wa!=null) {
-				sb.append("		s.lock_write();\n");
+				sb.append("		lock_write();\n");
 			}
 			
 			// générer l'appel à la méthode de la classe métier
 			if (!m.getReturnType().toString().equals("void")) {
-				sb.append("		return o.");
+				sb.append("		"+m.getReturnType().getName()+" rt = o.");
 			} else {
 				sb.append("		o.");
 			}
@@ -88,7 +93,11 @@ public class StubGenerator {
 			
 			// générer la libération du verrou
 			if (ra!=null || wa!=null) {
-				sb.append("		s.unlock();\n");
+				sb.append("		unlock();\n");
+			}
+			
+			if (!m.getReturnType().toString().equals("void")) {
+				sb.append("		return rt;\n");
 			}
 			
 			sb.append("	}\n\n");
@@ -101,11 +110,13 @@ public class StubGenerator {
 	/**
 	 * Génère un stub à partir d'une classe
 	 * @param c classe dont on veut le stub
+	 * @return path du source créé
 	 */
-	public static void generateStub(Class c) {
+	public static String generateStubSource(Class c) {
 		
 		// créer le fichier source du stub et un moyen d'y écrire
-		File file = new File(c.getName().concat("_stub.java"));
+		String path = c.getName().concat("_stub.java");
+		File file = new File(path);
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(file);
@@ -126,7 +137,7 @@ public class StubGenerator {
 		sb.append("	}\n\n");
 	
 		// générer les méthodes
-		sb = generateMethods(c, sb);
+		sb = generateMethodsCode(c, sb);
 		
 		sb.append("}");
 		
@@ -134,13 +145,52 @@ public class StubGenerator {
 		try {
 			writer.write(sb.toString());
 			writer.flush();
+			writer.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		return path;
 	}
 	
+	/**
+	 * Compile le fichier source donné en paramètre
+	 * @param srcPath path du fichier
+	 * @return true si compilation réussie, false sinon
+	 */
+	public static boolean compile(String srcPath) {
+		boolean compilResult = false;
+	    String [] source = { new String(srcPath)};
+	    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+	    
+	    int compilationResult = compiler.run(null, null, null, source);
+	    if(compilationResult == 0){
+	    	compilResult = true;
+	    } 
+	    
+	    return compilResult;
+	}
+	
+	/**
+	 * Donne le stub de la classe passée en paramètre
+	 * @return le stub
+	 * @throws CompilationFailedException 
+	 */
+	public static Class getStub(Class c) throws CompilationFailedException {
+		String path = generateStubSource(c);
+		if(!compile(path)){
+			throw new CompilationFailedException(c.getName().concat("_stub.java"));	      
+		}
+		Class stub = null;
+		try {
+			stub = Class.forName(c.getName().concat("_stub.java"));
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return stub;
+	}
 	
 	public static void main (String[] args) { 
 		Class c = null;
@@ -150,7 +200,8 @@ public class StubGenerator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		generateStub(c);
+		String path = generateStubSource(c);
+		compile(path);
 	}
 
 }

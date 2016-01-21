@@ -1,16 +1,22 @@
 public class Sentence_stub extends SharedObject implements Sentence_itf, java.io.Serializable {
-	
+
 	public Sentence_stub(Object o, int id) {
 		super(o, id);
-		// TODO Auto-generated constructor stub
 	}
-	public void write(String text) {
-		Sentence s = (Sentence)obj;
-		s.write(text);
+
+	public void write(java.lang.String arg0) {
+		Sentence o = (Sentence) obj;
+		lock_write();
+		o.write(arg0);
+		unlock();
 	}
-	public String read() {
-		Sentence s = (Sentence)obj;
-		return s.read();	
+
+	public java.lang.String read() {
+		Sentence o = (Sentence) obj;
+		lock_read();
+		java.lang.String rt = o.read();
+		unlock();
+		return rt;
 	}
-	
+
 }
