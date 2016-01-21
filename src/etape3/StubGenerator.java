@@ -184,7 +184,7 @@ public class StubGenerator {
 		}
 		Class stub = null;
 		try {
-			stub = Class.forName(c.getName().concat("_stub.java"));
+			stub = Class.forName(c.getName().concat("_stub"));
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

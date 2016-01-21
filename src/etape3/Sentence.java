@@ -11,10 +11,12 @@ public class Sentence implements java.io.Serializable {
 	@Write
 	public void write(String text) {
 		data = text;
+		System.out.println("sentence write" + text + data);
 	}
 	
 	@Read
 	public String read() {
+		System.out.println("sentence read" + data);
 		return data;	
 	}
 	
