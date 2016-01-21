@@ -1,4 +1,5 @@
 
+import java.lang.reflect.InvocationTargetException;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
@@ -37,8 +38,17 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			Integer id = s.lookup(name);
 			if (id != 0) {
 				so = objects.get(id);
-				if (so == null) {
-					so = new SharedObject(null,id);
+				if (so == null) {;
+					try {
+					    Class[] args = new Class[2];
+					    args[0] = Object.class;
+					    args[1] = int.class;
+						so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(null,id);
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+							| NoSuchMethodException | SecurityException | CompilationFailedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					objects.put(id,so);
 				}
 			}
@@ -70,7 +80,17 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		SharedObject so = new SharedObject(o,id);
+		SharedObject so = null;
+		try {
+		    Class[] args = new Class[2];
+		    args[0] = Object.class;
+		    args[1] = int.class;
+			so = (SharedObject) StubGenerator.getStub(o.getClass()).getDeclaredConstructor(args).newInstance(o,id);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException | CompilationFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		objects.put(id, so);
 		return so;
 	}

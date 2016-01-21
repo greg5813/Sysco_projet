@@ -7,7 +7,7 @@ import java.util.List;
 public class ServerObject implements Serializable, ServerObject_itf {
 	
 	private enum Etat {NL, RL, WL};
-	private Object obj;
+	Object obj;
 	private static Etat lock = Etat.NL;
 	private ArrayList<Client_itf> clientsReaders;
 	private Client_itf clientWriter;

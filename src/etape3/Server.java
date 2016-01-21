@@ -55,6 +55,11 @@ public class Server extends UnicastRemoteObject implements Server_itf{
 		return servers.get(id).lock_write(client);
 	}
 	
+	// request class of object id to generate suitable stub in client
+	public Class getClass(Integer id) throws RemoteException {
+		return servers.get(id).obj.getClass();
+	}
+	
 	public static void main(String[] args){
 		try{
 			LocateRegistry.createRegistry(1099);
