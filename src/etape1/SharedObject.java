@@ -8,8 +8,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	Object obj;
 	int id;
 	
-	public SharedObject(Object o, int id) {
-		this.obj = o;
+	public SharedObject(int id) {
 		this.id = id;
 	}
 	

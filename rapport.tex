@@ -32,11 +32,42 @@ utilisant le serveur de nom. On ne gère pas le stockage de référence à des o
 
 \subsection{Coté client}
 \subparagraph{Classe Client}
+\begin{itemize}
+\item[init]
+\item[lookup]
+\item[register]
+\item[create]
+\item[lock\_read]
+\item[lock\_write]
+\item[reduce\_lock]
+\item[invalidate\_reader]
+\item[invalidate\_writer]
+\end{itemize}
+
 \subparagraph{Classe SharedObject}
+\begin{itemize}
+\item[lock\_read]
+\item[lock\_write]
+\item[reduce\_lock]
+\item[invalidate\_reader]
+\item[invalidate\_writer]
+\end{itemize}
 
 \subsection{Coté serveur}
 \subparagraph{Classe Server}
+\begin{itemize}
+\item[lookup]
+\item[register]
+\item[create]
+\item[lock\_read]
+\item[lock\_write]
+\end{itemize}
+
 \subparagraph{Classe ServerObject}
+\begin{itemize}
+\item[lock\_read]
+\item[lock\_write]
+\end{itemize}
 
 
 \clearpage

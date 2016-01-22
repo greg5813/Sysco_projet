@@ -43,7 +43,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 					    Class[] args = new Class[2];
 					    args[0] = Object.class;
 					    args[1] = int.class;
-						so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(null,id);
+						so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 							| NoSuchMethodException | SecurityException | CompilationFailedException e) {
 						// TODO Auto-generated catch block
@@ -85,7 +85,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		    Class[] args = new Class[2];
 		    args[0] = Object.class;
 		    args[1] = int.class;
-			so = (SharedObject) StubGenerator.getStub(o.getClass()).getDeclaredConstructor(args).newInstance(o,id);
+			so = (SharedObject) StubGenerator.getStub(o.getClass()).getDeclaredConstructor(args).newInstance(id);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | CompilationFailedException e) {
 			// TODO Auto-generated catch block
@@ -101,7 +101,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// request a read lock from the server
 	public static Object lock_read(int id) {
-		System.err.println("client lockread");
 		Object o = null;
 		try {
 			o = s.lock_read(id, c);
@@ -114,7 +113,6 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// request a write lock from the server
 	public static Object lock_write (int id) {
-		System.err.println("client lockwrite");
 		Object o = null;
 		try {
 			o = s.lock_write(id, c);
@@ -127,21 +125,18 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
-		System.err.println("client reducelock");
 		return objects.get(id).reduce_lock();
 	}
 
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
-		System.err.println("client invalidatereader");
 		objects.get(id).invalidate_reader();
 	}
 
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
-		System.err.println("client invalidatewriter");
 		return objects.get(id).invalidate_writer();
 	}
 	

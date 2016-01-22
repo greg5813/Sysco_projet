@@ -132,8 +132,8 @@ public class StubGenerator {
 		
 		// générer le code du stub
 		// générer le constructeur
-		sb.append("	public "+c.getName()+"_stub(Object o, int id) {\n");
-		sb.append("		super(o, id);\n");
+		sb.append("	public "+c.getName()+"_stub(int id) {\n");
+		sb.append("		super(id);\n");
 		sb.append("	}\n\n");
 	
 		// générer les méthodes

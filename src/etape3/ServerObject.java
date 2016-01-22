@@ -34,7 +34,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		}
 		clientsReaders.add(client);		
 		lock = Etat.RL;
-		System.err.println("serverobject lockread id "+id +" state " + lock);		
+		System.out.println("serverobject lockread id "+id +" state " + lock);		
 		return obj;
 	}
 
@@ -71,7 +71,7 @@ public class ServerObject implements Serializable, ServerObject_itf {
 		}
 		clientWriter=client;
 		lock = Etat.WL;
-		System.err.println("serverobject lockwrite id "+id +" state " + lock);
+		System.out.println("serverobject lockwrite id "+id +" state " + lock);
 		return obj;
 	}
 	

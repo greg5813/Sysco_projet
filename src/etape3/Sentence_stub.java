@@ -1,7 +1,7 @@
 public class Sentence_stub extends SharedObject implements Sentence_itf, java.io.Serializable {
 
-	public Sentence_stub(Object o, int id) {
-		super(o, id);
+	public Sentence_stub(int id) {
+		super(id);
 	}
 
 	public void write(java.lang.String arg0) {
