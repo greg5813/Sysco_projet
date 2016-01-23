@@ -54,29 +54,59 @@ utilisant le serveur de nom. On ne gère pas le stockage de référence à des o
 \end{itemize}
 
 \subsection{Coté serveur}
-\subparagraph{Classe Server}
+
+\bigskip
+
+\paragraph{La classe Server}
+
+contient trois attributs:
 \begin{itemize}
-\item[lookup]
-\item[register]
-\item[create]
-\item[lock\_read]
-\item[lock\_write]
+\item[- un entier qui est l'identifiant unique retourné pour chaque SharedObject]
+\item[- une HashMap qui lie les ServerObject à leur identifiant]
+\item[- une HashMap qui lie les identifiants des ServerObject à leur nom]
 \end{itemize}
 
-\subparagraph{Classe ServerObject}
+\smallskip
+\subparagraph{lookup}
+Permet de récupérer l'identifiant d'un objet partagé en fonction de son nom.
+\subparagraph{register}
+Enregistre le lien entre l'identifiant d'un objet partagé et son nom.
+\subparagraph{create}
+Crée un nouvel objet partagé et retourne son identifiant.
+\subparagraph{lock\_read}
+Passe la demande de lock\_read au ServerObject correspondant.
+\subparagraph{lock\_write}
+Passe la demande de lock\_write au ServerObject correspondant.
+
+\bigskip
+\bigskip
+
+\paragraph{La classe ServerObject}
+
+ contient cinq attributs:
 \begin{itemize}
-\item[lock\_read]
-\item[lock\_write]
+\item[- une énumération représentant l'état de l'objet]
+\item[- l'état actuel de l'objet]
+\item[- la liste des clients en lecture]
+\item[- le client en écriture]
+\item[- l'identifiant unique de l'objet partagé]
 \end{itemize}
+
+\smallskip
+\subparagraph{lock\_read}
+Permet d'ajouter un client en lecture tout en s'assurant qu'il n'ai pas de client en écriture. Appel reduce\_lock sur le client en écriture pour s'en assurer.
+\subparagraph{lock\_write}
+Permet de passer un client en lecture tout en s'assurant qu'il n'y ai pas de client en lecture ou en écriture.\\
+Appel invalidate\_writer sur le client en écriture et crée un thread qui appel invalidate\_reader sur chaque client dans la liste des lecteurs pour une gestion efficace de la cohérence.
 
 
 \clearpage
 \section{Etape 2}
 
+
 \clearpage
 \section{Etape 3}
 
-\bigskip
 \bigskip
 \bigskip
 
@@ -93,11 +123,24 @@ On utilise la classe File qui permet de créer un nouveau fichier et la classe F
 Toute l'architecture du stub est écrite dans des chaines de caractères statique et seules les parties dépendantes de la classe dont on génère le stub telles que le nom des méthodes ou des paramètres est récupérés au moment opportun.\\
  On utilise l'introspection de Java pour accéder à la classe métier. Attention, l'utilisation de la méthode getParameter pour récupérer les paramètres d'une méthode nécessite l'utilisation de Java 8.\\
 
-Lorsque le client à besoin du stub d'un objet, il utilise la méthode getStub en passant la classe de l'objet dont il veut le stub en paramètre et la méthode lui renvoi la classe du stub. Le code du stub est ainsi généré et compilé à la volée et instancié par le client de façon transparente pour le programmeur. Le stub n'est généré que si une classe nomdeclasse\_stub n'existe pas déjà pour éviter de créer un source et le compiler à chaque fois que l'on demande un stub. Si l'on modifie l'objet, il faut donc supprimer son stub pour qu'un nouveau soit généré au prochain appel.
+Lorsque le client à besoin du stub d'un objet, il utilise la méthode getStub en passant la classe de l'objet dont il veut le stub en paramètre et la méthode lui renvoi la classe du stub. Le code du stub est ainsi généré et compilé à la volée et instancié par le client de façon transparente pour le programmeur. Le stub n'est généré que si une classe nomdeclasse\_stub n'existe pas déjà pour éviter de créer un source et le compiler à chaque fois que l'on demande un stub. Si l'on modifie l'objet, il faut donc supprimer son stub pour qu'un nouveau soit généré au prochain appel.\\
+
+Une méthode a été ajoutée à la classe Server pour récupérer la classe de l'objet partagé afin de créer le bon stub lors de l'appel de la méthode lookup dans la classe Client.
+
 
 \clearpage
 \section{Etape 4}
 
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+On désire prendre en compte le stockage de référence à des objets partagés dans des objets partagés.\\
+
+Il s'agit de spécialiser la méthode readResolve dans la classe SharedObject pour que lorsqu'un SharedObject est désérialisé (ce qui arrive uniquement lorsqu'il est lui même contenu dans un objet partagé) il soit remplacé par le stub local correspondant.\\
+
+La méthode lookup a été surchargée dans la classe Client afin de rendre le stub de l'objet partagé non pas en fonction de son nom mais de son identifiant.
 
 
 \end{document}          
