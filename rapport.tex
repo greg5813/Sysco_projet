@@ -93,7 +93,7 @@ On utilise la classe File qui permet de créer un nouveau fichier et la classe F
 Toute l'architecture du stub est écrite dans des chaines de caractères statique et seules les parties dépendantes de la classe dont on génère le stub telles que le nom des méthodes ou des paramètres est récupérés au moment opportun.\\
  On utilise l'introspection de Java pour accéder à la classe métier. Attention, l'utilisation de la méthode getParameter pour récupérer les paramètres d'une méthode nécessite l'utilisation de Java 8.\\
 
-Lorsque le client à besoin du stub d'un objet, il utilise la méthode getStub en passant la classe de l'objet dont il veut le stub en paramètre et la méthode lui renvoi la classe du stub. Le code du stub est ainsi généré et compilé à la volée et instancié par le client de façon transparente pour le programmeur.
+Lorsque le client à besoin du stub d'un objet, il utilise la méthode getStub en passant la classe de l'objet dont il veut le stub en paramètre et la méthode lui renvoi la classe du stub. Le code du stub est ainsi généré et compilé à la volée et instancié par le client de façon transparente pour le programmeur. Le stub n'est généré que si une classe nomdeclasse\_stub n'existe pas déjà pour éviter de créer un source et le compiler à chaque fois que l'on demande un stub. Si l'on modifie l'objet, il faut donc supprimer son stub pour qu'un nouveau soit généré au prochain appel.
 
 \clearpage
 \section{Etape 4}
