@@ -175,7 +175,8 @@ public class SharedObject implements Serializable, SharedObject_itf {
 		return obj;
 	}
 	
+	// rebind the reference to another sharedobject after deserialization
 	private Object ReadResolve() {
-		return Client.lookup(null);
+		return Client.lookup(id);
 	}
 }

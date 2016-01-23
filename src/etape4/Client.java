@@ -57,7 +57,26 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 		return so;
-	}		
+	}	
+	
+	// lookup the sharedobject to rebind the reference after deserialization
+	public static SharedObject lookup(int id) {
+		SharedObject so = null;
+		so = objects.get(id);
+		if (so == null) {
+			try {
+			    Class[] args = new Class[2];
+			    args[0] = Object.class;
+			    args[1] = int.class;
+				so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException | CompilationFailedException | RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			return so;
+	}	
 	
 	// binding in the name server
 	public static void register(String name, SharedObject_itf so) {
