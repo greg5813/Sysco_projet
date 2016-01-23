@@ -178,16 +178,14 @@ public class StubGenerator {
 	 * @throws CompilationFailedException 
 	 */
 	public static Class getStub(Class c) throws CompilationFailedException {
-		String path = generateStubSource(c);
-		if(!compile(path)){
-			throw new CompilationFailedException(c.getName().concat("_stub.java"));	      
-		}
 		Class stub = null;
 		try {
 			stub = Class.forName(c.getName().concat("_stub"));
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String path = generateStubSource(c);
+			if(!compile(path)){
+				throw new CompilationFailedException(c.getName().concat("_stub.java"));	      
+			}
 		}
 		return stub;
 	}

@@ -176,6 +176,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
 	
 	private Object ReadResolve() {
-		return id;
+		return Client.lookup(null);
 	}
 }
