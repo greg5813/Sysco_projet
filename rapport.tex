@@ -31,27 +31,58 @@ On suppose que chaque application voulant utiliser un objet en récupère une r�
 utilisant le serveur de nom. On ne gère pas le stockage de référence à des objets partagés dans des objets partagés pour l'instant.
 
 \subsection{Coté client}
-\subparagraph{Classe Client}
+
+\bigskip
+
+\subparagraph{La classe Client}
+
+\smallskip
+
+\subparagraph{init}
+Initialise la connexion avec le serveur.
+\subparagraph{lookup}
+Retourne la référence à l'objet partagé, null si il n'existe pas.
+\subparagraph{register}
+Enregistre un nouvel objet partagé dans le serveur.
+\subparagraph{create}
+Crée un nouvel objet partagé.
+\subparagraph{lock\_read}
+Demande le verrou en lecture d'un objet partagé.
+\subparagraph{lock\_write}
+Demande le verrou en écriture d'un objet partagé.
+\subparagraph{reduce\_lock}
+Réduit le verrou d'un objet partagé.
+\subparagraph{invalidat\_reader}
+Supprime le verrou en lecture d'un objet partagé.
+\subparagraph{invalidate\_writer}
+Supprime le verrou en écriture d'un objet partagé.
+
+\bigskip
+
+\subparagraph{La classe SharedObject}
+contient trois attributs:
 \begin{itemize}
-\item[init]
-\item[lookup]
-\item[register]
-\item[create]
-\item[lock\_read]
-\item[lock\_write]
-\item[reduce\_lock]
-\item[invalidate\_reader]
-\item[invalidate\_writer]
+\item[- une énumération représentant l'état de l'objet]
+\item[- l'état actuel de l'objet]
+\item[- l'identifiant unique de l'objet partagé]
 \end{itemize}
 
-\subparagraph{Classe SharedObject}
-\begin{itemize}
-\item[lock\_read]
-\item[lock\_write]
-\item[reduce\_lock]
-\item[invalidate\_reader]
-\item[invalidate\_writer]
-\end{itemize}
+\subparagraph{lock\_read}
+Gère la demande de verrou en lecture sur l'objet partagé en fonction de l'état actuel.
+\subparagraph{lock\_write}
+Gère la demande de verrou en écriture sur l'objet partagé en fonction de l'état actuel.
+\subparagraph{reduce\_lock}
+Gère la demande de réduction de verrou en lecture sur l'objet partagé en fonction de l'état actuel.
+\subparagraph{invalidate\_reader}
+Gère la demande d'invalidation de verrou en lecture sur l'objet partagé en fonction de l'état actuel.
+\subparagraph{invalidate\_writer}
+Gère la demande d'invalidation de verrou en écriture sur l'objet partagé en fonction de l'état actuel.\\
+
+La gestion de la synchronisation est garantie par par l'exclusion mutuelle des call-backs du serveur (modifier synchronized) et l'utilisation du moniteur java sur l'objet et de ses méthodes wait et notify.
+
+
+\bigskip
+\bigskip
 
 \subsection{Coté serveur}
 
@@ -76,9 +107,10 @@ Crée un nouvel objet partagé et retourne son identifiant.
 \subparagraph{lock\_read}
 Passe la demande de lock\_read au ServerObject correspondant.
 \subparagraph{lock\_write}
-Passe la demande de lock\_write au ServerObject correspondant.
+Passe la demande de lock\_write au ServerObject correspondant.\\
 
-\bigskip
+La méthode principale initiale la connexion distante et enregistre le serveur dans le serveur de nom.
+
 \bigskip
 
 \paragraph{La classe ServerObject}
@@ -97,7 +129,9 @@ Passe la demande de lock\_write au ServerObject correspondant.
 Permet d'ajouter un client en lecture tout en s'assurant qu'il n'ai pas de client en écriture. Appel reduce\_lock sur le client en écriture pour s'en assurer.
 \subparagraph{lock\_write}
 Permet de passer un client en lecture tout en s'assurant qu'il n'y ai pas de client en lecture ou en écriture.\\
-Appel invalidate\_writer sur le client en écriture et crée un thread qui appel invalidate\_reader sur chaque client dans la liste des lecteurs pour une gestion efficace de la cohérence.
+Appel invalidate\_writer sur le client en écriture et crée un thread qui appel invalidate\_reader sur chaque client dans la liste des lecteurs pour une gestion efficace de la cohérence.\\
+
+Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion mutuelle et évite le croisement d'appel comme illustré dans le sujet.
 
 
 \clearpage
