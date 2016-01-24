@@ -162,7 +162,7 @@ class commitListener implements ActionListener {
 		// display the read value
 		irc.text.append("commit \n");
 		
-            System.out.println("irc commit");
+            //System.out.println("irc commit");
 	}
 }
 

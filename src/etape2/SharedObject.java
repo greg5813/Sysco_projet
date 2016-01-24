@@ -20,82 +20,82 @@ public class SharedObject implements Serializable, SharedObject_itf {
             transObj = Transaction.getCurrentTransaction();
             if (transObj == null){
                 switch (lock) {
-		case NL:
-			obj = Client.lock_read(id);
-			lock = Etat.RLT; 	
-			break;
-		case RLT:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				case NL:
+					obj = Client.lock_read(id);
+					lock = Etat.RLT; 	
+					break;
+				case RLT:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				case RLC: 		
+					lock = Etat.RLT; 	
+					break;	
+				case WLT:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					};
+					break;	
+				case WLC: 		
+					lock = Etat.RLT_WLC; 	
+					break;
+				case RLT_WLC:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				break;
 			}
-			break;
-		case RLC: 		
-			lock = Etat.RLT; 	
-			break;	
-		case WLT:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			};
-			break;	
-		case WLC: 		
-			lock = Etat.RLT_WLC; 	
-			break;
-		case RLT_WLC:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
-		}
-		System.out.println("sharedobject lockread id "+id +" state " + lock);
-            }else{
-                if (transObj.isActive()) {
-                    transObj.addObjectRead(id, this);                
-                }
-                switch (lock) {
-		case NL:
-			obj = Client.lock_read(id);
-			lock = Etat.RLT; 	
-			break;
-		case RLT:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
-		case RLC: 		
-			lock = Etat.RLT; 	
-			break;	
-		case WLT:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			};
-			break;	
-		case WLC: 		
-			lock = Etat.RLT_WLC; 	
-			break;
-		case RLT_WLC:
-			try {
-				throw new NestedLocksException("lock_read imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
-		}
+			System.out.println("sharedobject lockread id "+id +" state " + lock);
+	        }else{
+	            if (transObj.isActive()) {
+	                    transObj.addObjectRead(id, this);                
+	            }
+		        switch (lock) {
+				case NL:
+					obj = Client.lock_read(id);
+					lock = Etat.RLT; 	
+					break;
+				case RLT:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				case RLC: 		
+					lock = Etat.RLT; 	
+					break;	
+				case WLT:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					};
+					break;	
+				case WLC: 		
+					lock = Etat.RLT_WLC; 	
+					break;
+				case RLT_WLC:
+					try {
+						throw new NestedLocksException("lock_read imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				}
             }
 	}
 
@@ -105,49 +105,48 @@ public class SharedObject implements Serializable, SharedObject_itf {
             if(transObj == null){
                 System.out.println("no hay transaction en lockwrite");
                 switch (lock) {
-		case NL: 		
-			obj = Client.lock_write(id);
-			lock = Etat.WLT; 	
-			break;
-		case RLT:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
-		case RLC:
-			obj = Client.lock_write(id);
-			lock = Etat.WLT; 	
-			break;
-		case WLT:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;	
-		case WLC: 		
-			lock = Etat.WLT; 	
-			break;	
-		case RLT_WLC:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
+			case NL: 		
+				obj = Client.lock_write(id);
+				lock = Etat.WLT; 	
+				break;
+			case RLT:
+				try {
+					throw new NestedLocksException("lock_write imbriqué");
+				} catch (NestedLocksException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+			case RLC:
+				obj = Client.lock_write(id);
+				lock = Etat.WLT; 	
+				break;
+			case WLT:
+				try {
+					throw new NestedLocksException("lock_write imbriqué");
+				} catch (NestedLocksException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;	
+			case WLC: 		
+				lock = Etat.WLT; 	
+				break;	
+			case RLT_WLC:
+				try {
+					throw new NestedLocksException("lock_write imbriqué");
+				} catch (NestedLocksException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
 		}
 		System.out.println("sharedobject lockwrite id "+id +" state " + lock);
             }else{
                 if (transObj.isActive()) {
                     transObj.addObjectWrite(id, this);
-                    if (!transObj.isSaved(id)) {
-                        Object aux = new Sentence();
-                        ((Sentence)aux).data=((Sentence)obj).data;
+                    if (!transObj.hasBeenModified(id)) {
+                        Object aux = deepClone(obj);
                         transObj.addMemoire(id, aux);
                         System.out.println("                add obj "+((Sentence)transObj.getObject(id)).data + " to memoire");
                     }
@@ -155,41 +154,41 @@ public class SharedObject implements Serializable, SharedObject_itf {
                     System.out.println("TRANSACTION STRUCTURE \n -objw.size:"+transObj.transWrite.size()+"\n -objr.size:"+transObj.transRead.size()+"\n -objm:"+((Sentence)transObj.getObject(id)).data);
                 }
                 switch (lock) {
-		case NL: 		
-			obj = Client.lock_write(id);
-			lock = Etat.WLT; 	
-			break;
-		case RLT:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
-		case RLC:
-			obj = Client.lock_write(id);
-			lock = Etat.WLT; 	
-			break;
-		case WLT:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;	
-		case WLC: 		
-			lock = Etat.WLT; 	
-			break;	
-		case RLT_WLC:
-			try {
-				throw new NestedLocksException("lock_write imbriqué");
-			} catch (NestedLocksException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			break;
+				case NL: 		
+					obj = Client.lock_write(id);
+					lock = Etat.WLT; 	
+					break;
+				case RLT:
+					try {
+						throw new NestedLocksException("lock_write imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
+				case RLC:
+					obj = Client.lock_write(id);
+					lock = Etat.WLT; 	
+					break;
+				case WLT:
+					try {
+						throw new NestedLocksException("lock_write imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;	
+				case WLC: 		
+					lock = Etat.WLT; 	
+					break;	
+				case RLT_WLC:
+					try {
+						throw new NestedLocksException("lock_write imbriqué");
+					} catch (NestedLocksException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					break;
 		}
 		System.out.println("sharedobject lockwrite id "+id +" state " + lock);
             }
@@ -222,15 +221,16 @@ public class SharedObject implements Serializable, SharedObject_itf {
                     }
                     System.out.println("sharedobject unlock id "+id +" state " + lock);
             }else{
-                if(transObj.isActive() && transObj.isInTransactionalMode(id)){ ///////////////////differentier les read y les writes
+                if(transObj.isActive() && transObj.hasBeenModified(id)){ ///////////////////differentier les read y les writes
                     System.out.println("sharedobjet doesn't released, transactional mode");
                 }else{
                     if (!transObj.isCommitValide()) {
                         System.out.println("DANS UNLOCK");
                         System.out.println("TRANSACTION STRUCTURE \n -objw.size:"+transObj.transWrite.size()+"\n -objr.size:"+transObj.transRead.size()+"\n -objm:"+((Sentence)transObj.getObject(id)).data);
-                        ((Sentence)obj).data = ((Sentence)transObj.getObject(id)).data;
+                        obj = deepClone(transObj.getObject(id));
                         
                         System.out.println(" ABORT PREVIOUS OBJ "+((Sentence)transObj.getObject(id)).data);
+                        transObj.commitDone();
                     }
                     switch (lock) {
                     case NL:
@@ -314,19 +314,19 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	}
         
         
-        public Object cloneObjet(){
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(baos);
-                oos.writeObject(obj);
-                
-                ByteArrayInputStream bais = new ObjectInputStream(baos.toByteArray());
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                return (Object) ois.readObject();
-            } catch (IOException e) {
-                return null;
-            } catch (ClassNotFoundException e){
-                return null;
-            }
-        }
+	 public static Object deepClone(Object object) {
+		   try {
+		     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		     ObjectOutputStream oos = new ObjectOutputStream(baos);
+		     oos.writeObject(object);
+		     
+		     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		     ObjectInputStream ois = new ObjectInputStream(bais);
+		     return ois.readObject();
+		   }
+		   catch (Exception e) {
+		     e.printStackTrace();
+		     return null;
+		   }
+		 }
 }

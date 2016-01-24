@@ -103,6 +103,22 @@ Appel invalidate\_writer sur le client en écriture et crée un thread qui appel
 \clearpage
 \section{Etape 2}
 
+\bigskip
+\bigskip
+
+Dans l’étape deux,  on a implanté le service de transaction aux objets dupliqués de la façon suivante:\\
+
+Dans la Transaction on stocke trois listes (HashMap), une liste pour les SharedObjects lus, une liste pour les SharedObjects écrits et une liste pour les Objects qui ont été modifiés au cas où l’application fasse abort. Il y a aussi un boolean pour indiquer si la transaction est active et un boolean pour indiquer si l’application a appelé commit ou abort. Finalement, la Transaction a un attribut static transaction qu'on va envoyer chaque fois que SharedObjet appelle getCourrentTransaction. \\
+
+Par conséquent on est obligé d'ajouter les fonctions addObjectRead(), addObjectWrite(), addMemoire() qui ajoutent les SharedObjects et les Objects avec leur ID à leur listes respectives. Le hasbeenModified() a été ajouté afin de savoir si c’est la première fois que l’objet est modifié et le garder dans la mémoire. Le commitDone() a pour but de réinitialiser la variable commitvalide une fois que l’abort est exécuté. \\
+
+En sachant que l’application gérera la Transaction seulement avec les méthodes start(), commit() et abort(), on a modifié la classe SharedObject en ajoutant la méthode static getCurrentTransaction() pour récupérer la même transaction dans autre interface, ainsi le traitement de lockwrite(), lockread et unlock() pourront dans cette classe vérifier si la transaction est active.\\
+
+À l’intérieur du lock() on vérifie si l’application est en mode transactionnel avec isActive() et  on appelle addObjectWrite() ou addObjectRead() selon la méthode. Si l’application modifie l’objet on garde sa valeur en faisant un clonage Byte à Byte de celui-ci grâce à la méthode deepClone et l’implémentation de Serializable. \\
+
+Puis pour la fonction unlock() on regarde si la transaction n’est pas active pour libérer le verrou ou si l’objet n’a pas été modifié, sinon on ne le libère pas. Dans le cas où l’application appelle abort on retourne l’objet à l’état avant modification.\\
+
+Pour tester la fonctionnalité de transaction on a mis des boutons dans Irc pour appeler start, commit et abort, en assurant qu’on ne verrouille pas l’objet tant que la transaction est active. 
 
 \clearpage
 \section{Etape 3}

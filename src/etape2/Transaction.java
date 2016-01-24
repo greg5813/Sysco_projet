@@ -1,4 +1,6 @@
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Transaction {
 		boolean transactionnelMode;//savoir si une transaction est en mode transactionnel
@@ -28,23 +30,69 @@ public class Transaction {
 	// demarre une transaction (passe en mode transactionnel)
 	public void start() {
 		this.transactionnelMode=true;
-                this.memoire=new HashMap<Integer, Object>();
-                this.transRead = new HashMap<Integer,SharedObject>();
-                this.transWrite = new HashMap<Integer,SharedObject>();
                 t = this;
 	}
 	
 	// termine une transaction et passe en mode non transactionnel
 	public boolean commit(){
                 transactionnelMode = false;
+                Integer keyRead;
+                Iterator<Integer> objectsRead = transRead.keySet().iterator();
+                while (objectsRead.hasNext()) {
+                    keyRead = objectsRead.next();
+                    transRead.remove(keyRead);
+                    System.out.println("size memoire "+transRead.size());
+                }
+                
+                Iterator itWrite = transWrite.entrySet().iterator();
+                while (itWrite.hasNext()) {
+                    Map.Entry pairs = (Map.Entry)itWrite.next();
+                    ((SharedObject)pairs.getValue()).unlock();
+                    itWrite.remove();
+                }
+                
+                Integer keyMemoire;
+                Iterator<Integer> objects = memoire.keySet().iterator();
+                while (objects.hasNext()) {
+                    keyMemoire = objects.next();
+                    memoire.remove(keyMemoire);
+                    System.out.println("size memoire "+memoire.size());
+                }
 		return commitvalide;
+                
 	}
 		
 	// abandonne et annule une transaction (et passe en mode non transactionnel)
-	public void abort(){ /////////////////////// hay forma de hacer un callback?
+	public void abort(){
                 transactionnelMode = false;
 		commitvalide = false;
-                System.out.println("DANS TRANSACTION objm:"+memoire.get(1));
+                
+                Integer keyRead;
+                Iterator<Integer> objectsRead = transRead.keySet().iterator();
+                while (objectsRead.hasNext()) {
+                    keyRead = objectsRead.next();
+                    transRead.remove(keyRead);
+                    System.out.println("size memoire "+transRead.size());
+                }
+                
+                Iterator itWrite = transWrite.entrySet().iterator();
+                while (itWrite.hasNext()) {
+                    System.out.println("size transWrite "+transWrite.size());
+                    Map.Entry pairs = (Map.Entry)itWrite.next();
+                    ((SharedObject)pairs.getValue()).unlock();
+                    itWrite.remove();
+                    System.out.println("size transWrite "+transWrite.size());
+                }
+                
+                
+                               
+                Integer keyMemoire;
+                Iterator<Integer> objects = memoire.keySet().iterator();
+                while (objects.hasNext()) {
+                    keyMemoire = objects.next();
+                    memoire.remove(keyMemoire);
+                    System.out.println("size memoire "+memoire.size());
+                }
 	}
         
         public void addObjectWrite (Integer id, SharedObject so){
@@ -58,10 +106,9 @@ public class Transaction {
         public void addMemoire (Integer id, Object o){
             memoire.put(id, o);
         }
-	public boolean isInTransactionalMode (Integer id){
+	public boolean hasBeenModified (Integer id){
             boolean isContained=false;
-            isContained = transRead.containsKey(id); //////castear si es null
-            isContained = transWrite.containsKey(id);
+            isContained = memoire.containsKey(id);
             return isContained;
         }
         
@@ -72,8 +119,8 @@ public class Transaction {
         public Object getObject (Integer id){
             return memoire.get(id);
         }
-        
-        public boolean isSaved (Integer id){
-            return memoire.containsKey(id);
+                
+        public void commitDone (){
+            commitvalide=true;
         }
 }

@@ -1,3 +1,5 @@
+
+
 import java.awt.*;
 import java.awt.event.*;
 import java.rmi.*;
@@ -54,6 +56,9 @@ public class Irc extends Frame {
 		Button read_button = new Button("read");
 		read_button.addActionListener(new readListener(this));
 		add(read_button);
+		Button unlock_button = new Button("unlock");
+		unlock_button.addActionListener(new unlockListener(this));
+		add(unlock_button);
 		
 		setSize(470,300);
 		text.setBackground(Color.black); 
@@ -78,11 +83,11 @@ class readListener implements ActionListener {
 		// invoke the method
 		String s = ((Sentence)(irc.sentence.obj)).read();
 		
-		// unlock the object
-		irc.sentence.unlock();
 		
 		// display the read value
 		irc.text.append(s+"\n");
+		
+		System.out.println("irc read");
 	}
 }
 
@@ -103,10 +108,22 @@ class writeListener implements ActionListener {
 		((Sentence)(irc.sentence.obj)).write(Irc.myName+" wrote "+s);
 		irc.data.setText("");
 		
-		// unlock the object
-		irc.sentence.unlock();
+		System.out.println("irc write");
+		
 	}
 }
 
-
+class unlockListener implements ActionListener {
+	Irc irc;
+	public unlockListener (Irc i) {
+        	irc = i;
+	}
+	public void actionPerformed (ActionEvent e) {
+				
+		// unlock the object
+		irc.sentence.unlock();
+		
+		System.out.println("irc unlock");
+	}
+}
 
