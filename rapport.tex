@@ -78,7 +78,7 @@ Gère la demande d'invalidation de verrou en lecture sur l'objet partagé en fon
 \subparagraph{invalidate\_writer}
 Gère la demande d'invalidation de verrou en écriture sur l'objet partagé en fonction de l'état actuel.\\
 
-La gestion de la synchronisation est garantie par par l'exclusion mutuelle des call-backs du serveur (modifier synchronized) et l'utilisation du moniteur java sur l'objet et de ses méthodes wait et notify.
+La gestion de la synchronisation est garantie par l'exclusion mutuelle des call-backs du serveur (méthodes synchronized) et l'utilisation du moniteur java sur l'objet et ses méthodes wait et notify.
 
 
 \bigskip
@@ -131,7 +131,13 @@ Permet d'ajouter un client en lecture tout en s'assurant qu'il n'ai pas de clien
 Permet de passer un client en lecture tout en s'assurant qu'il n'y ai pas de client en lecture ou en écriture.\\
 Appel invalidate\_writer sur le client en écriture et crée un thread qui appel invalidate\_reader sur chaque client dans la liste des lecteurs pour une gestion efficace de la cohérence.\\
 
-Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion mutuelle et évite le croisement d'appel comme illustré dans le sujet.
+Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion mutuelle et évite le croisement d'appel comme illustré dans le sujet.\\
+
+\bigskip
+\bigskip
+
+L'application a été testée en modifiant Irc afin de séparer les lock et les unlocks (ajout d'un bouton) et la classe Test qui permet de stresser le serveur quand on en lance plusieurs instances. Si l'application client imbrique les locks, le SharedObject lève l'exception NestedLocksException.\\
+
 
 
 \clearpage
@@ -142,13 +148,13 @@ Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion
 
 Dans l’étape deux,  on a implanté le service de transaction aux objets dupliqués de la façon suivante:\\
 
-Dans la Transaction on stocke trois listes (HashMap), une liste pour les SharedObjects lus, une liste pour les SharedObjects écrits et une liste pour les Objects qui ont été modifiés au cas où l’application fasse abort. Il y a aussi un boolean pour indiquer si la transaction est active et un boolean pour indiquer si l’application a appelé commit ou abort. Finalement, la Transaction a un attribut static transaction qu'on va envoyer chaque fois que SharedObjet appelle getCourrentTransaction. \\
+Dans la Transaction on stocke trois listes (HashMap), une liste pour les SharedObjects lus, une liste pour les SharedObjects écrits et une liste des Objects qui ont été modifiés au cas où l’application fasse abort. Il y a aussi un boolean pour indiquer si la transaction est active et un boolean pour indiquer si l’application a appelé commit ou abort. Finalement, la Transaction a un attribut static transaction qu'on va envoyer chaque fois que SharedObjet appelle getCourrentTransaction. \\
 
-Par conséquent on est obligé d'ajouter les fonctions addObjectRead(), addObjectWrite(), addMemoire() qui ajoutent les SharedObjects et les Objects avec leur ID à leur listes respectives. Le hasbeenModified() a été ajouté afin de savoir si c’est la première fois que l’objet est modifié et le garder dans la mémoire. Le commitDone() a pour but de réinitialiser la variable commitvalide une fois que l’abort est exécuté. \\
+Par conséquent on est obligé d'ajouter les fonctions addObjectRead(), addObjectWrite(), addMemoire() qui ajoutent les SharedObjects et les Objects avec leur ID dans leur liste respective. Le hasbeenModified() a été ajouté afin de savoir si c’est la première fois que l’objet est modifié et le garder dans la mémoire. Le commitDone() a pour but de réinitialiser la variable commitvalide une fois que l’abort est exécuté. \\
 
 En sachant que l’application gérera la Transaction seulement avec les méthodes start(), commit() et abort(), on a modifié la classe SharedObject en ajoutant la méthode static getCurrentTransaction() pour récupérer la même transaction dans autre interface, ainsi le traitement de lockwrite(), lockread et unlock() pourront dans cette classe vérifier si la transaction est active.\\
 
-À l’intérieur du lock() on vérifie si l’application est en mode transactionnel avec isActive() et  on appelle addObjectWrite() ou addObjectRead() selon la méthode. Si l’application modifie l’objet on garde sa valeur en faisant un clonage Byte à Byte de celui-ci grâce à la méthode deepClone et l’implémentation de Serializable. \\
+À l’intérieur du lock() on vérifie si l’application est en mode transactionnel avec isActive() et  on appelle addObjectWrite() ou addObjectRead() selon la méthode. Si l’application modifie l’objet on garde sa valeur en faisant un clonage Byte à Byte de celui-ci grâce à la méthode deepClone qui utilise la serialisation. \\
 
 Puis pour la fonction unlock() on regarde si la transaction n’est pas active pour libérer le verrou ou si l’objet n’a pas été modifié, sinon on ne le libère pas. Dans le cas où l’application appelle abort on retourne l’objet à l’état avant modification.\\
 
@@ -175,7 +181,9 @@ Toute l'architecture du stub est écrite dans des chaines de caractères statiqu
 
 Lorsque le client à besoin du stub d'un objet, il utilise la méthode getStub en passant la classe de l'objet dont il veut le stub en paramètre et la méthode lui renvoi la classe du stub. Le code du stub est ainsi généré et compilé à la volée et instancié par le client de façon transparente pour le programmeur. Le stub n'est généré que si une classe nomdeclasse\_stub n'existe pas déjà pour éviter de créer un source et le compiler à chaque fois que l'on demande un stub. Si l'on modifie l'objet, il faut donc supprimer son stub pour qu'un nouveau soit généré au prochain appel.\\
 
-Une méthode a été ajoutée à la classe Server pour récupérer la classe de l'objet partagé afin de créer le bon stub lors de l'appel de la méthode lookup dans la classe Client.
+Une méthode a été ajoutée à la classe Server pour récupérer la classe de l'objet partagé afin de créer le bon stub lors de l'appel de la méthode lookup dans la classe Client.\\
+
+Si la compilation échoue, le StubGenerator lève l'exception CompilationFailedException.
 
 
 \clearpage
@@ -188,9 +196,11 @@ Une méthode a été ajoutée à la classe Server pour récupérer la classe de 
 
 On désire prendre en compte le stockage de référence à des objets partagés dans des objets partagés.\\
 
-Il s'agit de spécialiser la méthode readResolve dans la classe SharedObject pour que lorsqu'un SharedObject est désérialisé (ce qui arrive uniquement lorsqu'il est lui même contenu dans un objet partagé) il soit remplacé par le stub local correspondant.\\
+Il s'agit de spécialiser la méthode readResolve dans la classe SharedObject pour que lorsqu'un SharedObject est désérialisé dans le client (ce qui arrive uniquement lorsqu'il est lui même contenu dans un objet partagé) il soit remplacé par le stub local correspondant.\\
 
-La méthode lookup a été surchargée dans la classe Client afin de rendre le stub de l'objet partagé non pas en fonction de son nom mais de son identifiant.
+La méthode lookup a été surchargée dans la classe Client afin de rendre le stub de l'objet partagé non pas en fonction de son nom mais de son identifiant.\\
+
+L'étape a été testée en modifiant Irc pour utilisée un Sentence\_cx qui contient un Sentence et vérifier l'installation du stub en local lorsque l'on récupère l'objet partagé.
 
 
 \end{document}          

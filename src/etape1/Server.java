@@ -52,6 +52,7 @@ public class Server extends UnicastRemoteObject implements Server_itf{
 	// request a lock_write of the shared object on the appropriate ServerObject
 	@Override
 	public Object lock_write(int id, Client_itf client) throws RemoteException {
+		
 		return servers.get(id).lock_write(client);
 	}
 	

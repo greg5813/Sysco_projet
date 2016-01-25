@@ -1,7 +1,7 @@
 public class Sentence implements java.io.Serializable {
 	String 		data;
 	public Sentence() {
-		data = new String("");
+		data = new String("0");
 	}
 	
 	public void write(String text) {

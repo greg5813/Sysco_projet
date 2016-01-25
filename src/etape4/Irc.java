@@ -11,7 +11,7 @@ import java.rmi.registry.*;
 public class Irc extends Frame {
 	public TextArea		text;
 	public TextField	data;
-	Sentence_itf		sentence;
+	Sentence_cx_itf		sentence;
 	static String		myName;
 
 	public static void main(String argv[]) {
@@ -32,11 +32,16 @@ public class Irc extends Frame {
 			s = (Sentence_itf)Client.create(new Sentence());
 			Client.register("IRC", s);
 		}
+		Sentence_cx_itf s2 = (Sentence_cx_itf)Client.lookup("IRC2");
+		if (s2 == null) {
+			s2 = (Sentence_cx_itf)Client.create(new Sentence_cx(s));
+			Client.register("IRC2", s2);
+		}
 		// create the graphical part
-		new Irc(s);
+		new Irc(s,s2);
 	}
 
-	public Irc(Sentence_itf s) {
+	public Irc(Sentence_itf s,Sentence_cx_itf s2) {
 	
 		setLayout(new FlowLayout());
 	
@@ -59,7 +64,7 @@ public class Irc extends Frame {
 		text.setBackground(Color.black); 
 		show();		
 		
-		sentence = s;
+		sentence = s2;
 	}
 }
 
@@ -76,7 +81,8 @@ class readListener implements ActionListener {
 		//irc.sentence.lock_read();
 		
 		// invoke the method
-		String s = irc.sentence.read();
+		String s = irc.sentence.read() + irc.sentence.getObj().read();
+		
 		
 		// unlock the object
 		//irc.sentence.unlock();
@@ -102,6 +108,7 @@ class writeListener implements ActionListener {
 		
 		// invoke the method
 		irc.sentence.write(Irc.myName+" wrote "+s);
+		irc.sentence.getObj().write(" and wrote "+s+" in ref");
 		irc.data.setText("");
 		
 		// unlock the object

@@ -4,7 +4,7 @@ import java.io.*;
 public class SharedObject implements Serializable, SharedObject_itf {
 	
 	private enum Etat {NL, RLT, RLC, WLT, WLC, RLT_WLC};
-	private static Etat lock = Etat.NL;
+	private Etat lock = Etat.NL;
 	Object obj;
 	int id;
 	
@@ -56,7 +56,7 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	// invoked by the user program on the client node
 	public void lock_write() {
 		switch (lock) {
-		case NL: 		
+		case NL:
 			obj = Client.lock_write(id);
 			lock = Etat.WLT; 	
 			break;

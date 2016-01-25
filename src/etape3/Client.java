@@ -40,9 +40,8 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 				so = objects.get(id);
 				if (so == null) {;
 					try {
-					    Class[] args = new Class[2];
-					    args[0] = Object.class;
-					    args[1] = int.class;
+					    Class[] args = new Class[1];
+					    args[0] = int.class;
 						so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 							| NoSuchMethodException | SecurityException | CompilationFailedException e) {
@@ -57,7 +56,25 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 			e.printStackTrace();
 		}
 		return so;
-	}		
+	}	
+	
+	// lookup the sharedobject to rebind the reference after deserialization
+	public static SharedObject lookup(int id) {
+		SharedObject so = null;
+		so = objects.get(id);
+		if (so == null) {
+			try {
+			    Class[] args = new Class[1];
+			    args[0] = int.class;
+				so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException | CompilationFailedException | RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			return so;
+	}	
 	
 	// binding in the name server
 	public static void register(String name, SharedObject_itf so) {
@@ -82,9 +99,9 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		SharedObject so = null;
 		try {
-		    Class[] args = new Class[2];
-		    args[0] = Object.class;
-		    args[1] = int.class;
+			StubGenerator.getStub(o.getClass());
+		    Class[] args = new Class[1];
+		    args[0] = int.class;
 			so = (SharedObject) StubGenerator.getStub(o.getClass()).getDeclaredConstructor(args).newInstance(id);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | CompilationFailedException e) {
@@ -125,18 +142,21 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
+	  	System.out.println("reduce_lock");
 		return objects.get(id).reduce_lock();
 	}
 
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
+	  	System.out.println("invalidate_reader");
 		objects.get(id).invalidate_reader();
 	}
 
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
+	  	System.out.println("invalidate_writer");
 		return objects.get(id).invalidate_writer();
 	}
 	

@@ -93,6 +93,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// request a write lock from the server
 	public static Object lock_write (int id) {
+		System.out.println("client lock write "+id);
 		Object o = null;
 		try {
 			o = s.lock_write(id, c);
@@ -105,18 +106,21 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// receive a lock reduction request from the server
 	public Object reduce_lock(int id) throws java.rmi.RemoteException {
+	  	System.out.println("reduce_lock " + id);
 		return objects.get(id).reduce_lock();
 	}
 
 
 	// receive a reader invalidation request from the server
 	public void invalidate_reader(int id) throws java.rmi.RemoteException {
+	  	System.out.println("invalidate_reader " + id);
 		objects.get(id).invalidate_reader();
 	}
 
 
 	// receive a writer invalidation request from the server
 	public Object invalidate_writer(int id) throws java.rmi.RemoteException {
+	  	System.out.println("invalidate_writer " + id);
 		return objects.get(id).invalidate_writer();
 	}
 	

@@ -8,7 +8,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 	
 	private static HashMap<Integer,SharedObject> objects;
 	private static Server_itf s;
-	private static Client c;
+	static Client c;
 
 	public Client() throws RemoteException {
 		super();
@@ -40,9 +40,8 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 				so = objects.get(id);
 				if (so == null) {;
 					try {
-					    Class[] args = new Class[2];
-					    args[0] = Object.class;
-					    args[1] = int.class;
+					    Class[] args = new Class[1];
+					    args[0] = int.class;
 						so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
 					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 							| NoSuchMethodException | SecurityException | CompilationFailedException e) {
@@ -65,9 +64,8 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		so = objects.get(id);
 		if (so == null) {
 			try {
-			    Class[] args = new Class[2];
-			    args[0] = Object.class;
-			    args[1] = int.class;
+			    Class[] args = new Class[1];
+			    args[0] = int.class;
 				so = (SharedObject) StubGenerator.getStub(s.getClass(id)).getDeclaredConstructor(args).newInstance(id);
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 					| NoSuchMethodException | SecurityException | CompilationFailedException | RemoteException e) {
@@ -101,9 +99,9 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 		}
 		SharedObject so = null;
 		try {
-		    Class[] args = new Class[2];
-		    args[0] = Object.class;
-		    args[1] = int.class;
+			StubGenerator.getStub(o.getClass());
+		    Class[] args = new Class[1];
+		    args[0] = int.class;
 			so = (SharedObject) StubGenerator.getStub(o.getClass()).getDeclaredConstructor(args).newInstance(id);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | CompilationFailedException e) {
