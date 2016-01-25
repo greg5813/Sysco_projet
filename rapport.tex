@@ -131,12 +131,13 @@ Permet d'ajouter un client en lecture tout en s'assurant qu'il n'ai pas de clien
 Permet de passer un client en lecture tout en s'assurant qu'il n'y ai pas de client en lecture ou en écriture.\\
 Appel invalidate\_writer sur le client en écriture et crée un thread qui appel invalidate\_reader sur chaque client dans la liste des lecteurs pour une gestion efficace de la cohérence.\\
 
-Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion mutuelle et évite le croisement d'appel comme illustré dans le sujet.\\
+Les deux méthodes sont synchronized ce qui garanti leur exécution en exclusion mutuelle et évite le croisement d'appels comme illustré dans le sujet.\\
 
 \bigskip
 \bigskip
 
-L'application a été testée en modifiant Irc afin de séparer les lock et les unlocks (ajout d'un bouton) et la classe Test qui permet de stresser le serveur quand on en lance plusieurs instances. Si l'application client imbrique les locks, le SharedObject lève l'exception NestedLocksException.\\
+L'application a été testée en modifiant Irc afin de séparer les lock et les unlocks (ajout d'un bouton) et la classe Test qui permet de stresser le serveur quand on en lance plusieurs instances. \\
+Si l'application client imbrique les locks sur un même objet, le SharedObject lève l'exception NestedLocksException et les interblocages ne sont pas gérés.\\
 
 
 
@@ -158,7 +159,8 @@ En sachant que l’application gérera la Transaction seulement avec les méthod
 
 Puis pour la fonction unlock() on regarde si la transaction n’est pas active pour libérer le verrou ou si l’objet n’a pas été modifié, sinon on ne le libère pas. Dans le cas où l’application appelle abort on retourne l’objet à l’état avant modification.\\
 
-Pour tester la fonctionnalité de transaction on a mis des boutons dans Irc pour appeler start, commit et abort, en assurant qu’on ne verrouille pas l’objet tant que la transaction est active. 
+Pour tester la fonctionnalité de transaction on a mis des boutons dans Irc pour appeler start, commit et abort, en assurant qu’on ne verrouille pas l’objet tant que la transaction est active. \\
+On a aussi crée une classe Tests qui permet de stresser la transaction. Elle crée le nombre de ClientsTest passé en paramètre et ces derniers exécutent en mode transactionnel le nombre d'actions sur le nombre d'objets définis dans Tests.
 
 \clearpage
 \section{Etape 3}

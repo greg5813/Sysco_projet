@@ -10,7 +10,7 @@ import java.lang.*;
 import java.rmi.registry.*;
 
 
-public class Tests extends Frame implements Runnable{
+public class Tests implements Runnable{
     
     private ClientTest client;
     private long initialTime;

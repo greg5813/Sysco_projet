@@ -4,15 +4,15 @@ import java.io.*;
 public class SharedObject implements Serializable, SharedObject_itf {
 	
 	private enum Etat {NL, RLT, RLC, WLT, WLC, RLT_WLC};
-	private static Etat lock = Etat.NL;
+	private Etat lock = Etat.NL;
 	Object obj;
 	int id;
 	Transaction transObj;
         
-        
 	public SharedObject(Object o, int id) {
 		this.obj = o;
 		this.id = id;
+                this.lock = Etat.NL;
 	}
 	
 	// invoked by the user program on the client node
@@ -103,7 +103,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	public void lock_write() {
             transObj = Transaction.getCurrentTransaction();
             if(transObj == null){
-                System.out.println("no hay transaction en lockwrite");
                 switch (lock) {
 			case NL: 		
 				obj = Client.lock_write(id);
@@ -198,7 +197,6 @@ public class SharedObject implements Serializable, SharedObject_itf {
 	public synchronized void unlock() {
             transObj = Transaction.getCurrentTransaction();
             if (transObj == null){
-                System.out.println("no hay transaction en unlock");
                 switch (lock) {
                     case NL:
                             break;
